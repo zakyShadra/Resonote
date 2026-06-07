@@ -1,0 +1,33 @@
+.sidebar {
+  width: 250px;
+  min-height: 100vh;
+  background: #1e293b;
+  color: white;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.sidebar h2 {
+  margin-bottom: 30px;
+}
+
+.menu {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: white;
+  text-align: left;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.menu:hover {
+  background: #334155;
+}
+
+.menu.active {
+  background: #3b82f6;
+}
