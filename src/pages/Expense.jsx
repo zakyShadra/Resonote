@@ -9,6 +9,17 @@ import * as XLSX from "xlsx";
 import CurrencyInput from "../components/currentInput";
 import "../style/Expense.css";
 
+import {
+  Wallet,
+  Calendars,
+  BanknoteArrowUp,
+  BanknoteArrowDown,
+  Banknote,
+  ScrollText,
+  ChartColumn,
+  FileDown,
+} from "lucide-react";
+
 const CATEGORIES = {
   Makanan:   { color: "#FF6B6B", icon: "🍜" },
   Transport: { color: "#4ECDC4", icon: "🚗" },
@@ -207,12 +218,12 @@ function Expense() {
   /* ── render ── */
   return (
     <div className="expense-container">
-      <h1>💸 Expense Tracker</h1>
+      <h1><Wallet size={22} /> Expense Tracker</h1>
 
       {/* ─── SALDO CARDS ─── */}
       <div className="balance-cards">
         <div className="bal-card bal-initial">
-          <span className="bal-label">💰 Saldo Awal</span>
+          <span className="bal-label"><BanknoteArrowUp size={22}/> Saldo Awal</span>
           <span className="bal-amount">{formatRupiah(initialBalance)}</span>
           <button className="bal-edit-btn" onClick={() => setShowBalEdit(!showBalEdit)}>
             ✏️ Ubah
@@ -220,12 +231,12 @@ function Expense() {
         </div>
 
         <div className="bal-card bal-out">
-          <span className="bal-label">📤 Total Keluar</span>
+          <span className="bal-label"><BanknoteArrowDown size={22}/> Total Keluar</span>
           <span className="bal-amount">{formatRupiah(totalExpenses)}</span>
         </div>
 
         <div className={`bal-card ${currentBalance >= 0 ? "bal-safe" : "bal-danger"}`}>
-          <span className="bal-label">💳 Saldo Sekarang</span>
+          <span className="bal-label"><Banknote size={22}/> Saldo Sekarang</span>
           <span className="bal-amount">{formatRupiah(currentBalance)}</span>
           {currentBalance < 0 && (
             <span className="bal-warning">⚠️ Saldo minus!</span>
@@ -309,7 +320,7 @@ function Expense() {
       {/* ─── MONTHLY HISTORY ─── */}
       {monthlyData.length > 0 && (
         <div className="monthly-history">
-          <h2>📅 Riwayat Bulanan</h2>
+          <h2><Calendars size={22}/> Riwayat Bulanan</h2>
           <div className="history-list">
             {[...monthlyData].reverse().map((m, i, arr) => {
               const prev = arr[i + 1];
@@ -349,7 +360,7 @@ function Expense() {
       {expenses.length > 0 && (
         <div className="chart-section">
           <div className="chart-header">
-            <h2>📊 Analitik</h2>
+            <h2><ChartColumn size={22}/> Analitik</h2>
             <div className="chart-toggle">
               {[
                 { key: "pie",  label: "🥧 Pie" },
@@ -457,7 +468,7 @@ function Expense() {
 
         {expenses.length > 0 && (
           <button className="btn-export" onClick={handleExport}>
-            📥 Export Excel
+            <FileDown size={22}/> Export Excel
           </button>
         )}
       </div>
@@ -466,7 +477,7 @@ function Expense() {
       <div className="expense-table-wrapper">
         {filteredExpenses.length === 0 ? (
           <div className="expense-empty">
-            <p>🧾 Belum ada pengeluaran. Tambah sekarang!</p>
+            <p><ScrollText size={22}/> Belum ada pengeluaran. Tambah sekarang!</p>
           </div>
         ) : (
           <table className="expense-table">

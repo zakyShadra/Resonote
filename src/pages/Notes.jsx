@@ -1,6 +1,12 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import "../style/Notes.css";
 
+import {
+  NotepadText,
+  StickyNoteX,
+  Pin,
+} from "lucide-react";
+
 /* ── CONSTANTS ── */
 const NOTE_COLORS = [
   { label: "Default", value: "#ffffff" },
@@ -238,7 +244,7 @@ function Notes() {
 
       {/* ─ HEADER ─ */}
       <div className="notes-header">
-        <h1>📝 Notes</h1>
+        <h1><NotepadText  size={22}/> Notes</h1>
         <div className="notes-header-actions">
           <button
             className={`view-btn ${viewMode === "grid" ? "active" : ""}`}
@@ -288,7 +294,7 @@ function Notes() {
       {/* ─ EMPTY STATE ─ */}
       {filtered.length === 0 && (
         <div className="notes-empty">
-          <p>📭 Tidak ada catatan.</p>
+          <p><StickyNoteX size={22}/> Tidak ada catatan.</p>
           {notes.length === 0 && (
             <button className="btn-new-note" onClick={openNew}>
               + Buat catatan pertama
@@ -300,7 +306,7 @@ function Notes() {
       {/* ─ PINNED ─ */}
       {pinned.length > 0 && (
         <section className="notes-section">
-          <h2 className="section-label">📌 Disematkan</h2>
+          <h2 className="section-label"><Pin size={22}/> Disematkan</h2>
           <div className={viewMode === "grid" ? "notes-grid" : "notes-list"}>
             {pinned.map((n) => <NoteCard key={n.id} note={n} />)}
           </div>

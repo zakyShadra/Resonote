@@ -1,6 +1,17 @@
 import "../style/Topbar.css";
 
+import {
+    Calendars,
+} from "lucide-react";
+
 function Topbar({ toggleMenu }) {
+    const today = new Date().toLocaleDateString("id-ID", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
+
     return (
         <div className="topbar">
         <button
@@ -10,8 +21,9 @@ function Topbar({ toggleMenu }) {
             ☰
         </button>
 
-        <div className="mini-calendar">
-            📅 Juni 2026
+        <div className="current-date">
+            <Calendars size={18} />
+            {today}
         </div>
         </div>
     );

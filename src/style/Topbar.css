@@ -30,7 +30,7 @@
 }
 .hamburger:hover { background: var(--border); }
 
-.mini-calendar {
+.current-date {
   font-size: 0.82rem;
   color: var(--text2);
   background: var(--accent-soft);
@@ -44,4 +44,6 @@
 
 @media (max-width: 768px) {
   .topbar { padding: 0 14px; }
+}
+
 }

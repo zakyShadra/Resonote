@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ColorPaletteModal from "../components/ColorPaletteModal";
+import ColorPaletteModal from "../components/colorPaletteModal";
 import "../style/settings.css";
 
 const THEMES = [

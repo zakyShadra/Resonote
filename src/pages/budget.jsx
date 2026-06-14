@@ -1,6 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import CurrencyInput from "../components/currentInput";
 
+import {
+  Target,
+  Landmark,
+} from "lucide-react";
+
 const CATEGORIES = {
   Makanan:   { color:"#FF6B6B", icon:"🍜" },
   Transport: { color:"#4ECDC4", icon:"🚗" },
@@ -151,7 +156,7 @@ function Budget() {
 
   return (
     <div style={{ maxWidth:720, margin:"0 auto", animation:"page-in 0.25s ease" }}>
-      <h1 style={{ fontSize:"1.6rem", fontWeight:700, color:"var(--text1)", marginBottom:8 }}>🎯 Budget Goals</h1>
+      <h1 style={{ fontSize:"1.6rem", fontWeight:700, color:"var(--text1)", marginBottom:8 }}><Target size={22}/> Budget Goals</h1>
       <p style={{ color:"var(--text3)", fontSize:"0.88rem", marginBottom:24 }}>Kontrol pengeluaran kamu tiap bulan</p>
 
       {/* Month selector */}
@@ -174,7 +179,7 @@ function Budget() {
       <div style={{ background:"var(--bg-card)", border:"1.5px solid var(--border)", borderRadius:14, padding:"20px", marginBottom:20, boxShadow:"var(--shadow)" }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
           <div>
-            <h2 style={{ fontSize:"1rem", fontWeight:700, color:"var(--text1)" }}>📊 Budget Bulanan</h2>
+            <h2 style={{ fontSize:"1rem", fontWeight:700, color:"var(--text1)" }}><Landmark size={22}/> Budget Bulanan</h2>
             <p style={{ fontSize:"0.78rem", color:"var(--text3)", marginTop:2 }}>{getMonthLabel(monthKey)}</p>
           </div>
           <button
