@@ -1,6 +1,17 @@
 import { useState } from "react";
 import AddSubtaskModal from "./AddSubtaskModal";
 
+import {
+    BookOpen,
+    Briefcase,
+    Dumbbell,
+    Gamepad2,
+    NotebookPen,
+    Wallet,
+    Target,
+    House,
+} from "lucide-react";
+
 function TaskDetail({
     selectedTask,
     tasks,
@@ -10,7 +21,16 @@ function TaskDetail({
     const [subtaskModalOpen, setSubtaskModalOpen] = useState(false);
 
     if (!selectedTask) return null;
-
+    const iconMap = {
+        book: <BookOpen size={20} />,
+        work: <Briefcase size={20} />,
+        sport: <Dumbbell size={20} />,
+        game: <Gamepad2 size={20} />,
+        note: <NotebookPen size={20} />,
+        money: <Wallet size={20} />,
+        target: <Target size={20} />,
+        home: <House size={20} />,
+    };
     const addSubtask = (subtaskText) => {
         const updatedTasks =
         tasks.map((task) =>
@@ -117,19 +137,39 @@ function TaskDetail({
         <div className="task-detail-header">
             <div>
             <span className="task-detail-eyebrow">Task aktif</span>
-            <h2>
-                {selectedTask.icon}{" "}
+            <h2
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                }}
+                >
+                {iconMap[selectedTask.icon]}
                 {selectedTask.title}
             </h2>
             </div>
 
-            <button
-            className="add-subtask-btn"
-            onClick={() => setSubtaskModalOpen(true)}
-            >
-            <span className="add-subtask-icon">+</span>
-            <span>Subtask</span>
-            </button>
+            <div className="task-detail-header-actions">
+              <button
+                className="task-detail-close"
+                type="button"
+                onClick={() => setSelectedTask(null)}
+                title="Tutup task"
+              >
+                ✕
+              </button>
+
+              <button
+                className="add-subtask-btn"
+                type="button"
+                onClick={() => {
+                  setSubtaskModalOpen(true);
+                }}
+              >
+                <span className="add-subtask-icon">+</span>
+                <span>Subtask</span>
+              </button>
+            </div>
         </div>
 
         {selectedTask.subtasks
@@ -188,7 +228,9 @@ function TaskDetail({
 
         <AddSubtaskModal
             isOpen={subtaskModalOpen}
-            onClose={() => setSubtaskModalOpen(false)}
+            onClose={() => {
+              setSubtaskModalOpen(false);
+            }}
             onAdd={addSubtask}
         />
         </div>

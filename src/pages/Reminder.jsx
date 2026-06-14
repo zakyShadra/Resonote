@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import { getReminders } from "../utils/reminderEngine";
 import { getDeadlineStatus } from "../utils/deadlineUtils";
 
+import {
+  BellRing,
+} from "lucide-react";
+
 const timeAgo = (iso) => {
   const diff = Date.now() - new Date(iso).getTime();
   const mins = Math.floor(diff / 60000);
@@ -27,7 +31,6 @@ const timeUntil = (iso) => {
 function Reminder() {
   const [tasks, setTasks] = useState([]);
 
-  // ✅ FIX: live update setiap 10 detik, tidak hanya saat mount
   useEffect(() => {
     const load = () => {
       const data = JSON.parse(localStorage.getItem("resonote-tasks")) || [];
@@ -44,7 +47,7 @@ function Reminder() {
 
   return (
     <div style={{ maxWidth: "720px", margin: "0 auto" }}>
-      <h1 style={{ marginBottom: "24px", fontSize: "1.6rem" }}>🔔 Reminder</h1>
+      <h1 style={{ marginBottom: "24px", fontSize: "1.6rem" }}><BellRing size={22}/> Reminder</h1>
 
       {/* Summary bar */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "14px", marginBottom: "28px" }}>
@@ -61,7 +64,7 @@ function Reminder() {
       </div>
 
       {/* OVERDUE */}
-      <Section title="🔴 Overdue" empty="Tidak ada task yang overdue 🎉" color="#ef4444">
+      <Section title="🔴 Overdue" empty="Tidak ada task yang overdue " color="#ef4444">
         {overdue.map((t) => (
           <ReminderCard
             key={t.id}

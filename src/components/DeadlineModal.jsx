@@ -9,7 +9,6 @@ function DeadlineModal({
   const [deadlineDate, setDeadlineDate] = useState("");
   const [deadlineTime, setDeadlineTime] = useState("");
 
-  // Initialize form fields when deadline or modal state changes
   useEffect(() => {
     if (!isOpen) return;
     

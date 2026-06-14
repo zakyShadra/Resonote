@@ -1,6 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 import { monthNames } from "../utils/dateUtils";
+import ColorPaletteModal from "../components/colorPaletteModal";
 import "../style/calendar.css";
+
+import {
+    CalendarDays,
+    Calendars,
+    Palette,
+} from "lucide-react";  
 
 const DAYS = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 const GLOBAL_COUNTRIES = [
@@ -9,14 +16,6 @@ const GLOBAL_COUNTRIES = [
   { code: "SG", label: "Global - Singapura" },
   { code: "JP", label: "Global - Jepang" },
   { code: "SA", label: "Global - Saudi" },
-];
-const CUSTOM_COLORS = [
-  { label: "Merah", value: "#fee2e2" },
-  { label: "Pink", value: "#fce7f3" },
-  { label: "Kuning", value: "#fef3c7" },
-  { label: "Hijau", value: "#dcfce7" },
-  { label: "Biru", value: "#dbeafe" },
-  { label: "Ungu", value: "#ede9fe" },
 ];
 
 const formatDateKey = (year, month, day) =>
@@ -39,9 +38,20 @@ function Calendar() {
   const [holidayStatus, setHolidayStatus] = useState("");
   const [globalCountry, setGlobalCountry] = useState("US");
   const [selectedDateKey, setSelectedDateKey] = useState(null);
+  const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const [customDates, setCustomDates] = useState(() => {
     const saved = localStorage.getItem("resonote-calendar-custom-dates");
     return saved ? JSON.parse(saved) : {};
+  });
+
+  // Get calendar highlight color from settings
+  const [highlightColor, setHighlightColor] = useState(() => {
+    const saved = localStorage.getItem("resonote-settings");
+    if (saved) {
+      const settings = JSON.parse(saved);
+      return settings.calendarHighlightColor || "#3b82f6";
+    }
+    return "#3b82f6";
   });
 
   useEffect(() => {
@@ -128,76 +138,55 @@ function Calendar() {
     return days;
   };
 
-  const isSameCalendarDate = (value, d, m = month, y = year) => {
-    if (!value) return false;
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return false;
-    return date.getDate() === d && date.getMonth() === m && date.getFullYear() === y;
-  };
-
-  const getItemsForDate = (d) => {
+  const getTasksForDate = (d) => {
     if (!d) return [];
-    const dayTasks = tasks
-      .filter((t) => isSameCalendarDate(t.deadline, d))
-      .map((task) => ({ ...task, type: "task", label: task.title, marker: task.icon || "✓" }));
-    const dayNotes = notes
-      .filter((note) => isSameCalendarDate(note.date || note.deadline || note.updatedAt || note.createdAt, d))
-      .map((note) => ({ ...note, type: "note", label: note.title || note.content || "Catatan", marker: "N" }));
-
-    return [...dayTasks, ...dayNotes];
-  };
-
-  const getDateMeta = (d, m = month) => {
-    const dateKey = formatDateKey(year, m, d);
-    const weekday = new Date(year, m, d).getDay();
-    return {
-      dateKey,
-      custom: customDates[dateKey],
-      holidayList: holidaysByDate[dateKey] || [],
-      isSunday: weekday === 0,
-    };
-  };
-
-  const getMonthItemCount = (m) =>
-    tasks.filter((t) => {
+    return tasks.filter((t) => {
       if (!t.deadline) return false;
-      const d = new Date(t.deadline);
-      return !Number.isNaN(d.getTime()) && d.getMonth() === m && d.getFullYear() === year;
-    }).length +
-    notes.filter((n) => {
-      const value = n.date || n.deadline || n.updatedAt || n.createdAt;
-      if (!value) return false;
-      const d = new Date(value);
-      return !Number.isNaN(d.getTime()) && d.getMonth() === m && d.getFullYear() === year;
-    }).length;
-
-  const setCustomDateColor = (dateKey, color) => {
-    setCustomDates((prev) => ({
-      ...prev,
-      [dateKey]: { color },
-    }));
+      const td = new Date(t.deadline);
+      return td.getDate() === d && td.getMonth() === month && td.getFullYear() === year;
+    });
   };
 
-  const clearCustomDateColor = (dateKey) => {
-    setCustomDates((prev) => {
-      const next = { ...prev };
-      delete next[dateKey];
-      return next;
+  const getNotesForDate = (d) => {
+    if (!d) return [];
+    return notes.filter((n) => {
+      if (!n.createdAt) return false;
+      const nd = new Date(n.createdAt);
+      return nd.getDate() === d && nd.getMonth() === month && nd.getFullYear() === year;
     });
+  };
+
+  const handleColorPick = (color) => {
+    const settings = JSON.parse(localStorage.getItem("resonote-settings") || "{}");
+    settings.calendarHighlightColor = color;
+    localStorage.setItem("resonote-settings", JSON.stringify(settings));
+    setHighlightColor(color);
+  };
+
+  const handleDateColor = (day) => {
+    const dateKey = formatDateKey(year, month, day);
+    setSelectedDateKey(dateKey);
+    setColorPickerOpen(true);
   };
 
   const getDaysArray = getDaysForMonth();
 
   const prevMonth = () => {
-    if (month === 0) { setMonth(11); setYear(year - 1); }
-    else { setMonth(month - 1); }
-    setSelectedDateKey(null);
+    if (month === 0) {
+      setMonth(11);
+      setYear(year - 1);
+    } else {
+      setMonth(month - 1);
+    }
   };
 
   const nextMonth = () => {
-    if (month === 11) { setMonth(0); setYear(year + 1); }
-    else { setMonth(month + 1); }
-    setSelectedDateKey(null);
+    if (month === 11) {
+      setMonth(0);
+      setYear(year + 1);
+    } else {
+      setMonth(month + 1);
+    }
   };
 
   const prevYear = () => setYear(year - 1);
@@ -216,107 +205,84 @@ function Calendar() {
 
   return (
     <div className="calendar-page">
-      <div className="calendar-header-top">
-        <h1>Kalender {year}</h1>
-        <button
-          className={`view-toggle ${viewMode === "month" ? "active" : ""}`}
-          onClick={() => setViewMode("month")}
-        >
-          Bulan
-        </button>
-        <button
-          className={`view-toggle ${viewMode === "year" ? "active" : ""}`}
-          onClick={() => setViewMode("year")}
-        >
-          Tahun
-        </button>
-      </div>
+      <div className="calendar-header-wrapper">
+        <div className="calendar-date-display">
+          <h2><CalendarDays size={22} /> {monthNames[month]}</h2>
+          <span className="calendar-year">{year}</span>
+        </div>
 
-      <div className="calendar-tools">
-        <label>
-          Kalender global
-          <select value={globalCountry} onChange={(e) => setGlobalCountry(e.target.value)}>
+        <div className="calendar-controls">
+          <select
+            value={globalCountry}
+            onChange={(e) => setGlobalCountry(e.target.value)}
+            className="calendar-select"
+          >
             {GLOBAL_COUNTRIES.map((country) => (
-              <option key={country.code} value={country.code}>{country.label}</option>
+              <option key={country.code} value={country.code}>
+                {country.label}
+              </option>
             ))}
           </select>
-        </label>
-        <span className="calendar-status">
-          {holidayStatus || "Libur Indonesia + global aktif"}
-        </span>
+
+          <button
+            className={`view-toggle ${viewMode === "month" ? "active" : ""}`}
+            onClick={() => setViewMode("month")}
+          >
+            <CalendarDays size={22} /> Bulan
+          </button>
+          <button
+            className={`view-toggle ${viewMode === "year" ? "active" : ""}`}
+            onClick={() => setViewMode("year")}
+          >
+            <Calendars size={22} /> Tahun
+          </button>
+        </div>
       </div>
 
       {viewMode === "month" && (
         <div className="calendar-month-view">
           <div className="calendar-nav">
-            <button onClick={prevMonth}>◀</button>
-            <h2>{monthNames[month]} {year}</h2>
-            <button onClick={nextMonth}>▶</button>
+            <button onClick={prevMonth} className="nav-btn">◀</button>
+            <h3>{monthNames[month]} {year}</h3>
+            <button onClick={nextMonth} className="nav-btn">▶</button>
           </div>
 
           <div className="calendar-grid">
             {DAYS.map((d) => (
-              <div key={d} className={`calendar-day-header ${d === "Min" ? "sunday-header" : ""}`}>{d}</div>
+              <div key={d} className="calendar-day-header">{d}</div>
             ))}
             {getDaysArray.map((day, i) => {
-              const meta = day ? getDateMeta(day) : null;
-              const items = day ? getItemsForDate(day) : [];
-              const isMarkedRed = meta?.isSunday || meta?.holidayList.length > 0;
-
+              const dateKey = day ? formatDateKey(year, month, day) : null;
+              const customColor = customDates[dateKey];
               return (
                 <div
                   key={i}
-                  className={`calendar-cell ${!day ? "empty" : ""} ${isMarkedRed ? "holiday-cell" : ""} ${meta?.custom ? "custom-cell" : ""}`}
-                  style={meta?.custom ? { background: meta.custom.color, borderColor: meta.custom.color } : undefined}
-                  onClick={() => day && setSelectedDateKey(meta.dateKey)}
-                  title={meta?.holidayList.map((holiday) => holiday.localName || holiday.name).join(", ")}
+                  className={`calendar-cell ${!day ? "empty" : ""}`}
+                  style={customColor ? { backgroundColor: customColor, borderColor: customColor } : {}}
                 >
-                  {day && <div className="day-number">{day}</div>}
-                  {meta?.holidayList.length > 0 && (
-                    <div className="holiday-label">{meta.holidayList[0].localName || meta.holidayList[0].name}</div>
-                  )}
-                  <div className="tasks-in-day">
-                    {items.slice(0, 4).map((item) => (
-                      <div
-                        key={`${item.type}-${item.id}`}
-                        className={`task-dot ${item.type}-dot`}
-                        style={{ opacity: item.done ? 0.5 : 1 }}
-                        title={item.label}
-                      >
-                        {item.marker}
-                      </div>
-                    ))}
-                    {items.length > 4 && (
-                      <div className="task-dot more-dot">+{items.length - 4}</div>
-                    )}
-                  </div>
-
-                  {selectedDateKey === meta?.dateKey && (
-                    <div className="calendar-color-menu" onClick={(e) => e.stopPropagation()}>
-                      <strong>{day} {monthNames[month]}</strong>
-                      <div className="calendar-color-swatches">
-                        {CUSTOM_COLORS.map((color) => (
-                          <button
-                            key={color.value}
-                            title={color.label}
-                            style={{ background: color.value }}
-                            onClick={() => setCustomDateColor(meta.dateKey, color.value)}
-                          />
-                        ))}
-                      </div>
-                      {meta.holidayList.length > 0 && (
-                        <div className="holiday-menu-list">
-                          {meta.holidayList.slice(0, 3).map((holiday) => (
-                            <span key={`${holiday.source}-${holiday.name}`}>
-                              {holiday.source}: {holiday.localName || holiday.name}
-                            </span>
+                  {day && (
+                    <>
+                      <div className="day-number">{day}</div>
+                      <div className="cell-content">
+                        <div className="tasks-dots">
+                          {getTasksForDate(day).slice(0, 2).map((t) => (
+                            <span key={t.id} className="task-dot" title={t.title}>✓</span>
                           ))}
                         </div>
-                      )}
-                      <button className="clear-date-color" onClick={() => clearCustomDateColor(meta.dateKey)}>
-                        Reset warna
+                        <div className="notes-dots">
+                          {getNotesForDate(day).slice(0, 2).map((n) => (
+                            <span key={n.id} className="note-dot" title={n.title}>📝</span>
+                          ))}
+                        </div>
+                      </div>
+                      <button
+                        className="cell-color-btn"
+                        onClick={() => handleDateColor(day)}
+                        title="Ubah warna tanggal"
+                      >
+                        <Palette size={16} />
                       </button>
-                    </div>
+                    </>
                   )}
                 </div>
               );
@@ -328,9 +294,9 @@ function Calendar() {
       {viewMode === "year" && (
         <div className="calendar-year-view">
           <div className="calendar-nav">
-            <button onClick={prevYear}>◀◀ {year - 1}</button>
-            <h2>{year}</h2>
-            <button onClick={nextYear}>{year + 1} ▶▶</button>
+            <button onClick={prevYear} className="nav-btn">◀◀</button>
+            <h3>{year}</h3>
+            <button onClick={nextYear} className="nav-btn">▶▶</button>
           </div>
 
           <div className="months-grid">
@@ -338,33 +304,45 @@ function Calendar() {
               <div
                 key={m}
                 className="month-card"
-                onClick={() => { setMonth(m); setViewMode("month"); }}
+                onClick={() => {
+                  setMonth(m);
+                  setViewMode("month");
+                }}
               >
-                <h3>{name}</h3>
+                <h4>{name}</h4>
                 <div className="mini-calendar">
                   {DAYS.map((d) => (
                     <span key={d} className="mini-day-header">{d[0]}</span>
                   ))}
-                  {days.map((d, i) => {
-                    const meta = d ? getDateMeta(d, m) : null;
-                    const isMarkedRed = meta?.isSunday || meta?.holidayList.length > 0;
-                    return (
-                      <span
-                        key={i}
-                        className={`mini-day ${!d ? "empty" : ""} ${isMarkedRed ? "holiday-mini-day" : ""}`}
-                        style={meta?.custom ? { background: meta.custom.color } : undefined}
-                      >
-                        {d}
-                      </span>
-                    );
-                  })}
-                </div>
-                <div className="month-task-count">
-                  {getMonthItemCount(m)} item · {Object.keys(holidaysByDate).filter((key) => key.startsWith(`${year}-${String(m + 1).padStart(2, "0")}`)).length} libur
+                  {days.map((d, i) => (
+                    <span key={i} className={`mini-day ${!d ? "empty" : ""}`}>
+                      {d}
+                    </span>
+                  ))}
                 </div>
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      <ColorPaletteModal
+        isOpen={colorPickerOpen}
+        onClose={() => {
+          setColorPickerOpen(false);
+          setSelectedDateKey(null);
+        }}
+        onSelect={(color) => {
+          if (selectedDateKey) {
+            setCustomDates({ ...customDates, [selectedDateKey]: color });
+          }
+        }}
+        title="Warna Tanggal"
+      />
+
+      {holidayStatus && (
+        <div className="holiday-status">
+          ℹ️ {holidayStatus}
         </div>
       )}
     </div>

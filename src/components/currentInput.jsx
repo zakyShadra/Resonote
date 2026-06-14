@@ -1,8 +1,5 @@
 import { formatNumberInput, parseFormattedNumber } from "../utils/formatNumber.js";
 
-/**
- * CurrencyInput - auto-formats to 100.000 as user types
- */
 function CurrencyInput({
   value,
   onChange,

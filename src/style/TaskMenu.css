@@ -1,0 +1,53 @@
+.task-menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.task-menu {
+  position: absolute;
+  right: 0;
+  top: 42px;
+  background: var(--bg-solid);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  overflow: visible;
+  z-index: 100;
+  min-width: 220px;
+  max-width: 320px;
+  animation: page-in 0.15s ease;
+}
+
+
+.task-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-size: 0.9rem;
+  font-family: var(--font, inherit);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+
+.task-menu button:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.task-menu button .task-menu-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}
+

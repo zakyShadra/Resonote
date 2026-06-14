@@ -1,8 +1,31 @@
 import { useState } from "react";
 import TaskMenu from "./TaskMenu";
 
+import {
+  BookOpen,
+  Briefcase,
+  Dumbbell,
+  Gamepad2,
+  NotebookPen,
+  Wallet,
+  Target,
+  House,
+} from "lucide-react";
+
+const iconMap = {
+  book: <BookOpen size={18} />,
+  work: <Briefcase size={18} />,
+  sport: <Dumbbell size={18} />,
+  game: <Gamepad2 size={18} />,
+  note: <NotebookPen size={18} />,
+  money: <Wallet size={18} />,
+  target: <Target size={18} />,
+  home: <House size={18} />,
+};
+
 function TaskCard({
   task,
+  iconMap,
   setSelectedTask,
   toggleTask,
   getProgress,
@@ -55,8 +78,16 @@ function TaskCard({
                 toggleTask(task.id);
               }}
             />
-            <h3 style={{ textDecoration: task.done ? "line-through" : "none" }}>
-              {task.icon} {task.title}
+            <h3
+              style={{
+                textDecoration: task.done ? "line-through" : "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              {iconMap?.[task.icon]}
+              {task.title}
             </h3>
           </div>
         </div>

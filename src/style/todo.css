@@ -144,7 +144,7 @@
   box-shadow: var(--shadow);
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   align-items: flex-start;
   gap: 14px;
@@ -344,11 +344,13 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: var(--shadow-lg);
-  overflow: hidden;
-  z-index: 20;
-  min-width: 170px;
+  overflow: visible;
+  z-index: 500;
+  min-width: 220px;
+  max-width: 320px;
   animation: page-in 0.15s ease;
 }
+
 .task-menu button {
   display: flex;
   align-items: center;
@@ -424,6 +426,35 @@
   gap: 16px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--border);
+}
+
+.task-detail-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.task-detail-close {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s;
+}
+
+.task-detail-close:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  transform: translateY(-1px);
 }
 
 .task-detail-eyebrow {
@@ -553,3 +584,130 @@
   .task-detail-header { flex-direction: column; }
   .add-subtask-btn { width: 100%; justify-content: center; }
 }
+
+.subtask-add-menu {
+  position: absolute;
+  right: 0;
+  top: 44px;
+  background: var(--bg-solid);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  z-index: 800;
+  min-width: 220px;
+  overflow: hidden;
+  animation: page-in 0.15s ease;
+}
+
+.subtask-add-menu-item {
+  width: 100%;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-size: 0.9rem;
+  font-family: var(--font, inherit);
+  cursor: pointer;
+  text-align: left;
+}
+
+.subtask-add-menu-item:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.icon-picker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.icon-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .2s ease;
+}
+
+.icon-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+
+.icon-btn.selected {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.icon-dropdown {
+  position: relative;
+}
+
+.icon-dropdown-btn {
+  height: 44px;
+  min-width: 180px;
+
+  padding: 0 14px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  border-radius: 12px;
+  border: 1px solid var(--border);
+
+  background: var(--bg-card);
+  color: var(--text1);
+
+  cursor: pointer;
+}
+
+.icon-dropdown-menu {
+  position: absolute;
+  top: 50px;
+  left: 0;
+
+  min-width: 220px;
+
+  background: var(--bg-card);
+
+  border: 1px solid var(--border);
+  border-radius: 12px;
+
+  overflow: hidden;
+
+  z-index: 999;
+  box-shadow: 0 10px 30px rgba(0,0,0,.15);
+}
+
+.icon-option {
+  width: 100%;
+
+  padding: 12px 14px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: transparent;
+  border: none;
+
+  cursor: pointer;
+
+  color: var(--text1);
+}
+
+.icon-option:hover {
+  background: rgba(148,163,184,.1);
+}
+

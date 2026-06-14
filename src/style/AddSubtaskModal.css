@@ -1,7 +1,3 @@
-/* ═══════════════════════════════════════════
-   ADD SUBTASK MODAL — ReSoNote
-═══════════════════════════════════════════ */
-
 .add-subtask-overlay {
   position: fixed;
   inset: 0;
@@ -11,9 +7,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
+  z-index: 9999;
   padding: 16px;
   animation: fadeIn 0.2s ease;
+}
+
+/* ensure modal doesn't get cut off on short viewports */
+.add-subtask-modal {
+  max-height: min(80vh, 560px);
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes fadeIn {

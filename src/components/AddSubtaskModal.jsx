@@ -26,7 +26,7 @@ function AddSubtaskModal({ isOpen, onClose, onAdd }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
-          <h2>➕ Tambah Subtask</h2>
+          <h2> +Tambah Subtask</h2>
           <button 
             className="modal-close" 
             onClick={onClose}

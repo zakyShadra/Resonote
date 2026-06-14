@@ -1,19 +1,28 @@
 import { useState, useEffect } from "react";
-import { startReminderRunner } from "../utils/reminderRunner";
-import { notify } from "../adapters/webNotifier";
+import { supabase } from "../lib/supabase"; 
 import TaskCard from "../components/TaskCard";
 import TaskDetail from "../components/TaskDetail";
 import DeadlineModal from "../components/DeadlineModal";
 import "../style/todo.css";
 
-function Todo() {
-  const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem("resonote-tasks");
-    return saved ? JSON.parse(saved) : [];
-  });
+import {
+  CheckSquare,
+  BookOpen,
+  Briefcase,
+  Dumbbell,
+  Gamepad2,
+  NotebookPen,
+  Wallet,
+  Target,
+  House,
+} from "lucide-react";
 
+function Todo() {
+  const [tasks, setTasks] = useState([]);
+  const [userId, setUserId] = useState(null);
   const [taskTitle, setTaskTitle] = useState("");
   const [taskIcon, setTaskIcon] = useState("");
+  const [showIconMenu, setShowIconMenu] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
@@ -21,19 +30,81 @@ function Todo() {
   const [deadlineValue, setDeadlineValue] = useState("");
   const [taskForDeadline, setTaskForDeadline] = useState(null);
 
-  useEffect(() => {
-    localStorage.setItem("resonote-tasks", JSON.stringify(tasks));
-  }, [tasks]);
+  const iconOptions = [
+    { icon: <BookOpen size={18} />, value: "book" },
+    { icon: <Briefcase size={18} />, value: "work" },
+    { icon: <Dumbbell size={18} />, value: "sport" },
+    { icon: <Gamepad2 size={18} />, value: "game" },
+    { icon: <NotebookPen size={18} />, value: "note" },
+    { icon: <Wallet size={18} />, value: "money" },
+    { icon: <Target size={18} />, value: "target" },
+    { icon: <House size={18} />, value: "home" },
+  ];
+  
+  const iconMap = {
+    book: <BookOpen size={18} />,
+    work: <Briefcase size={18} />,
+    sport: <Dumbbell size={18} />,
+    game: <Gamepad2 size={18} />,
+    note: <NotebookPen size={18} />,
+    money: <Wallet size={18} />,
+    target: <Target size={18} />,
+    home: <House size={18} />,
+  };
 
   useEffect(() => {
-    const interval = startReminderRunner(
-      () => JSON.parse(localStorage.getItem("resonote-tasks")) || [],
-      notify,
-      setTasks
-    );
-    return () => clearInterval(interval);
+    supabase.auth.getSession().then(({ data }) => {
+      setUserId(data.session?.user?.id);
+    });
   }, []);
 
+  useEffect(() => {
+    if (!userId) return;
+    
+    const loadTasks = async () => {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        const cached = localStorage.getItem("resonote-tasks");
+        setTasks(cached ? JSON.parse(cached) : []);
+      } else {
+        setTasks(data || []);
+        localStorage.setItem("resonote-tasks", JSON.stringify(data));
+      }
+    };
+    
+    loadTasks();
+  }, [userId]);
+
+  // EFFECT 3: Sync tasks to Supabase
+  useEffect(() => {
+    if (!userId || tasks.length === 0) return;
+    
+    supabase
+      .from('tasks')
+      .upsert(
+        tasks.map(t => ({
+          ...t,
+          user_id: userId,
+        }))
+      )
+      .catch(err => console.error('Sync error:', err));
+    
+    localStorage.setItem("resonote-tasks", JSON.stringify(tasks));
+  }, [tasks, userId]);
+
+  // EFFECT 4: Clear selected task if deleted
+  useEffect(() => {
+    if (!selectedTask) return;
+    const stillExist = tasks.find((t) => t.id === selectedTask.id);
+    if (!stillExist) setSelectedTask(null);
+  }, [tasks, selectedTask]);
+
+  // HANDLERS
   const addTask = () => {
     if (!taskTitle.trim()) return;
     const newTask = {
@@ -82,7 +153,6 @@ function Todo() {
     setDeadlineModalOpen(true);
   };
 
-  // ✅ FIX: terima finalDeadline dari modal sebagai parameter
   const saveDeadline = (finalDeadline) => {
     if (!taskForDeadline) return;
     const updated = tasks.map((t) =>
@@ -113,9 +183,10 @@ function Todo() {
     return true;
   });
 
+  // RENDER
   return (
     <div className="todo-container">
-      <h1>✅ Todo</h1>
+      <h1><CheckSquare size={22} /> Todo</h1>
 
       <input
         type="text"
@@ -149,18 +220,76 @@ function Todo() {
           onChange={(e) => setTaskTitle(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && addTask()}
         />
-        <select value={taskIcon} onChange={(e) => setTaskIcon(e.target.value)}>
-          <option value="">Tanpa Icon</option>
-          <option value="📚">📚 Belajar</option>
-          <option value="💼">💼 Kerja</option>
-          <option value="🏋">🏋 Olahraga</option>
-          <option value="🎮">🎮 Hiburan</option>
-          <option value="📝">📝 Catatan</option>
-          <option value="💰">💰 Keuangan</option>
-          <option value="🎯">🎯 Target</option>
-          <option value="🏠">🏠 Pribadi</option>
-        </select>
-        <button onClick={addTask} className="btn-add">+ Tambah</button>
+        <div className="icon-dropdown">
+        <button
+          type="button"
+          className="icon-dropdown-btn"
+          onClick={() => setShowIconMenu(!showIconMenu)}
+        >
+          {taskIcon
+            ? iconOptions.find((i) => i.value === taskIcon)?.icon
+            : "⭕"}
+          <span>
+            {taskIcon
+              ? {
+                  book: "Belajar",
+                  work: "Kerja",
+                  sport: "Olahraga",
+                  game: "Hiburan",
+                  note: "Catatan",
+                  money: "Keuangan",
+                  target: "Target",
+                  home: "Pribadi",
+                }[taskIcon]
+              : "Tanpa Icon"}
+          </span>
+          ▼
+        </button>
+
+        {showIconMenu && (
+          <div className="icon-dropdown-menu">
+            <button
+              type="button"
+              className="icon-option"
+              onClick={() => {
+                setTaskIcon("");
+                setShowIconMenu(false);
+              }}
+            >
+              ⭕ Tanpa Icon
+            </button>
+
+            {iconOptions.map((item) => (
+              <button
+                key={item.value}
+                type="button"
+                className="icon-option"
+                onClick={() => {
+                  setTaskIcon(item.value);
+                  setShowIconMenu(false);
+                }}
+              >
+                {item.icon}
+                <span>
+                  {{
+                    book: "Belajar",
+                    work: "Kerja",
+                    sport: "Olahraga",
+                    game: "Hiburan",
+                    note: "Catatan",
+                    money: "Keuangan",
+                    target: "Target",
+                    home: "Pribadi",
+                  }[item.value]}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+        <button onClick={addTask} className="btn-add">
+          + Tambah
+        </button>
       </div>
 
       <DeadlineModal
@@ -190,6 +319,7 @@ function Todo() {
         <TaskCard
           key={task.id}
           task={task}
+          iconMap={iconMap}
           selectedTask={selectedTask}
           setSelectedTask={setSelectedTask}
           toggleTask={toggleTask}
@@ -201,6 +331,6 @@ function Todo() {
       ))}
     </div>
   );
-}
+} 
 
 export default Todo;

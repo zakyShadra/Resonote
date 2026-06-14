@@ -1,6 +1,18 @@
 import { useEffect, useState } from "react";
 import { getReminders } from "../utils/reminderEngine";
 
+import {
+  CheckSquare,
+  Clock3,
+  AlertCircle,
+  AlarmClock,
+  NotepadText,
+  Wallet,
+  ClipboardList,
+  Birdhouse,
+  BellRing
+} from "lucide-react";
+
 function Dashboard() {
   const [data, setData] = useState({
     tasks: [], notes: [], expenses: [], balance: 0,
@@ -47,18 +59,18 @@ function Dashboard() {
 
       {/* Header */}
       <div style={{ marginBottom: "28px" }}>
-        <h1 style={{ fontSize: "1.6rem", marginBottom: "4px" }}>🏠 Dashboard</h1>
+        <h1 style={{ fontSize: "1.6rem", marginBottom: "4px" }}><Birdhouse size={22} /> Dashboard</h1>
         <p style={{ color: "#64748b", fontSize: "0.9rem" }}>{today}</p>
       </div>
 
       {/* Stats Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "14px", marginBottom: "28px" }}>
-        <StatCard icon="✅" label="Total Task"   value={totalTask}  sub={`${doneTask} selesai`}      bg="#f0f9ff" border="#bae6fd" />
-        <StatCard icon="⏳" label="Belum Selesai" value={undoneTask} sub="task aktif"                 bg="#fff7ed" border="#fed7aa" />
-        <StatCard icon="🔴" label="Overdue"       value={overdue.length} sub="perlu perhatian"        bg="#fff1f2" border="#fecdd3" valueColor="#ef4444" />
-        <StatCard icon="🟡" label="Deadline Dekat" value={upcoming.length} sub="dalam 24 jam"         bg="#fffbeb" border="#fde68a" valueColor="#d97706" />
-        <StatCard icon="📝" label="Total Notes"   value={notes.length} sub="catatan"                  bg="#f5f3ff" border="#ddd6fe" />
-        <StatCard icon="💸" label="Pengeluaran"   value={formatRp(totalExpense)} sub={`Saldo: ${formatRp(currentBalance)}`} bg="#f0fdf4" border="#bbf7d0" small />
+        <StatCard icon={<CheckSquare size={22} />} label="Total Task"   value={totalTask}  sub={`${doneTask} selesai`}      bg="#f0f9ff" border="#bae6fd" />
+        <StatCard icon={<Clock3 size={22} />} label="Belum Selesai" value={undoneTask} sub="task aktif"                 bg="#fff7ed" border="#fed7aa" />
+        <StatCard icon={<AlertCircle size={22} />} label="Overdue"       value={overdue.length} sub="perlu perhatian"        bg="#fff1f2" border="#fecdd3" valueColor="#ef4444" />
+        <StatCard icon={<AlarmClock size={22} />} label="Deadline Dekat" value={upcoming.length} sub="dalam 24 jam"         bg="#fffbeb" border="#fde68a" valueColor="#d97706" />
+        <StatCard icon={<NotepadText size={22} />} label="Total Notes"   value={notes.length} sub="catatan"                  bg="#f5f3ff" border="#ddd6fe" />
+        <StatCard icon={<Wallet size={22} />} label="Pengeluaran"   value={formatRp(totalExpense)} sub={`Saldo: ${formatRp(currentBalance)}`} bg="#f0fdf4" border="#bbf7d0" small />
       </div>
 
       {/* Bottom section */}
@@ -66,9 +78,9 @@ function Dashboard() {
 
         {/* Task pending */}
         <div style={{ background: "white", border: "1px solid #e2e8f0", borderRadius: "14px", padding: "20px" }}>
-          <h2 style={sectionTitle}>📋 Task Aktif</h2>
+          <h2 style={sectionTitle}> <ClipboardList size={22} /> Task Aktif</h2>
           {recentTasks.length === 0 ? (
-            <p style={emptyText}>Semua task sudah selesai! 🎉</p>
+            <p style={emptyText}>Semua task sudah selesai! </p>
           ) : (
             recentTasks.map((t) => (
               <div key={t.id} style={taskRow}>
@@ -88,9 +100,9 @@ function Dashboard() {
 
         {/* Urgent reminders */}
         <div style={{ background: "white", border: "1px solid #e2e8f0", borderRadius: "14px", padding: "20px" }}>
-          <h2 style={sectionTitle}>🔔 Urgent</h2>
+          <h2 style={sectionTitle}> <BellRing size={22}/> Urgent</h2>
           {urgentTasks.length === 0 && overdue.length === 0 ? (
-            <p style={emptyText}>Tidak ada yang overdue 🎉</p>
+            <p style={emptyText}>Tidak ada yang overdue </p>
           ) : (
             urgentTasks.length === 0 ? (
               <p style={emptyText}>Tidak ada yang overdue</p>
